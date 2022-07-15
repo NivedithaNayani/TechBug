@@ -14,12 +14,12 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
-gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False, base_url=None)
+gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False,
+                    base_url=None)
 
 ##CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///blog.db")
@@ -28,7 +28,7 @@ db = SQLAlchemy(app)
 
 
 ##CONFIGURE TABLES
-class User(UserMixin,db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     email = Column(String(250), nullable=False)
@@ -65,8 +65,8 @@ class Comment(db.Model):
     post_id = Column(Integer, ForeignKey('blog_posts.id'))
     parent_post = relationship("BlogPost", back_populates="comments")
 
-# db.create_all()
 
+db.create_all()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -77,17 +77,17 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-#Create admin-only decorator
+# Create admin-only decorator
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        #If id is not 1 then return abort with 403 error
+        # If id is not 1 then return abort with 403 error
         if current_user.id != 1:
             return abort(403)
-        #Otherwise continue with the route function
+        # Otherwise continue with the route function
         return f(*args, **kwargs)
-    return decorated_function
 
+    return decorated_function
 
 
 @app.route('/')
